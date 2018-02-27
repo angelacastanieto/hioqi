@@ -26,7 +26,7 @@ func init() {
 		fitbit.New(
 			os.Getenv("FITBIT_KEY"),
 			os.Getenv("FITBIT_SECRET"),
-			"http://localhost:3000/auth/fitbit/callback",
+			"http://localhost:8000/auth/fitbit/callback",
 			fitbit.ScopeActivity,
 			fitbit.ScopeWeight,
 			fitbit.ScopeProfile,
@@ -41,8 +41,9 @@ func main() {
 	p.Get("/auth/{provider}/callback", CallbackHandler)
 	p.Get("/auth/{provider}", gothic.BeginAuthHandler)
 	p.Get("/", IndexHandler)
+	p.Get("/users/:id", getUser)
 
 	n := negroni.Classic()
 	n.UseHandler(p)
-	n.Run(":3000")
+	n.Run(":8000")
 }
