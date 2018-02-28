@@ -3,21 +3,19 @@ package main
 import (
 	"os"
 
+	"github.com/angelacastanieto/hioqi/fitbitclient"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/pat"
 	"github.com/gorilla/sessions"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/fitbit"
-	render "gopkg.in/unrolled/render.v1"
 )
 
-var view = render.New(render.Options{
-	Directory:     "templates",
-	Extensions:    []string{".html"},
-	IsDevelopment: true,
-	IndentJSON:    true,
-})
+var (
+	err          error
+	fitbitClient *fitbitclient.API
+)
 
 var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_SECRET")))
 
@@ -36,12 +34,16 @@ func init() {
 }
 
 func main() {
+	fitbitClient, err = fitbitclient.NewAPI()
+	if err != nil {
+		panic(err)
+	}
+
 	p := pat.New()
 
 	p.Get("/auth/{provider}/callback", CallbackHandler)
 	p.Get("/auth/{provider}", gothic.BeginAuthHandler)
-	p.Get("/", IndexHandler)
-	p.Get("/users/:id", getUser)
+	p.Get("/users/{id}", GetUser)
 
 	n := negroni.Classic()
 	n.UseHandler(p)
