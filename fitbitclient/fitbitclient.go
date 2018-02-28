@@ -30,8 +30,17 @@ type (
 		Steps int64 `json:"steps"`
 	}
 
+	Goals struct {
+		ActiveMinutes int64   `json:"activeMinutes"`
+		CaloriesOut   int64   `json:"caloriesOut"`
+		distance      float64 `json:"distance"`
+		floors        int64   `json:"floors"`
+		steps         int64   `json:"steps"`
+	}
+
 	ActivitiesResponse struct {
 		Activities []Activity `json:"activities"`
+		Goals      Goals      `json:"goals"`
 	}
 )
 

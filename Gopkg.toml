@@ -34,3 +34,7 @@
 [[constraint]]
   name = "github.com/labstack/echo-contrib"
   version = "0.5.2"
+
+[[constraint]]
+  name = "gopkg.in/boj/redistore.v1"
+  version = "1.2.0"
