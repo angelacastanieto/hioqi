@@ -9,7 +9,7 @@ import (
 	"github.com/markbates/goth/gothic"
 )
 
-func GetUser(c echo.Context) error {
+func GetUser(c echo.Context) error { // TODO:  this should be GetActivities
 	id := c.Param("id")
 
 	token, err := redisClient.Get(fmt.Sprintf("%s:access_token", id)).Result()
