@@ -19,15 +19,15 @@ type (
 		ActivityCalories     int64      `json:"activityCalories"`
 		CaloriesBMR          int64      `json:"caloriesBMR"`
 		CaloriesOut          int64      `json:"caloriesOut"`
-		distances            []Distance `json:"distances"`
-		elevation            float64    `json:"elevation"`
-		fairlyActiveMinutes  int64      `json:"fairlyActiveMinutes"`
-		floors               int64      `json:"floors"`
-		lightlyActiveMinutes int64      `json:"lightlyActiveMinutes"`
-		marginalCalories     int64      `json:"marginalCalories"`
-		sedentaryMinutes     int64      `json:"sedentaryMinutes"`
-		steps                int64      `json:"steps"`
-		veryActiveMinutes    int64      `json:"veryActiveMinutes"`
+		Distances            []Distance `json:"distances"`
+		Elevation            float64    `json:"elevation"`
+		FairlyActiveMinutes  int64      `json:"fairlyActiveMinutes"`
+		Floors               int64      `json:"floors"`
+		LightlyActiveMinutes int64      `json:"lightlyActiveMinutes"`
+		MarginalCalories     int64      `json:"marginalCalories"`
+		SedentaryMinutes     int64      `json:"sedentaryMinutes"`
+		Steps                int64      `json:"steps"`
+		VeryActiveMinutes    int64      `json:"veryActiveMinutes"`
 	}
 
 	Distance struct {
@@ -37,7 +37,7 @@ type (
 
 	Activity struct {
 		ActivityID       string  `json:"activityId"`
-		CctivityParentID string  `json:"activityParentId"`
+		ActivityParentID string  `json:"activityParentId"`
 		Calories         int64   `json:"calories"`
 		Distance         float64 `json:"distance"`
 		Duration         int64   `json:"duration"`
@@ -51,9 +51,9 @@ type (
 	Goals struct {
 		ActiveMinutes int64   `json:"activeMinutes"`
 		CaloriesOut   int64   `json:"caloriesOut"`
-		distance      float64 `json:"distance"`
-		floors        int64   `json:"floors"`
-		steps         int64   `json:"steps"`
+		Distance      float64 `json:"distance"`
+		Floors        int64   `json:"floors"`
+		Steps         int64   `json:"steps"`
 	}
 
 	ActivitiesResponse struct {
