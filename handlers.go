@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/angelacastanieto/hioqi/fitbitclient"
 	"github.com/labstack/echo"
 	"github.com/markbates/goth/gothic"
 )
@@ -38,7 +37,7 @@ func GetUser(c echo.Context) error { // TODO:  this should be GetActivities
 		CaloriesOut:   activitiesResponse.Summary.CaloriesOut,
 		StepsGoal:     activitiesResponse.Goals.Steps,
 		StepsSoFar:    activitiesResponse.Summary.Steps,
-		StepsLeftToGo: stepsLeftToGo(activitiesResponse.Goals.CaloriesOut, activitiesResponse.Summary.CaloriesOut, caloriesOutPerStep(activitiesResponse.Activities, activitiesResponse.Summary.CaloriesOut, activitiesResponse.Summary.Steps)),
+		StepsLeftToGo: stepsLeftToGo(activitiesResponse.Goals.CaloriesOut, activitiesResponse.Summary.CaloriesOut, caloriesOutPerStep(activitiesResponse.Summary.CaloriesOut, activitiesResponse.Summary.Steps, activitiesResponse.Summary.CaloriesBMR)),
 	}
 
 	return c.JSON(http.StatusOK, getUserResponse)
@@ -72,20 +71,10 @@ func CallbackHandler(c echo.Context) error {
 	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000/users/"+user.UserID)
 }
 
-func caloriesOutPerStep(activities []fitbitclient.Activity, caloriesOut, stepsSoFar int64) float64 {
-	// need to subtract BMR calories
-	// also need to get this calc from last day on which you took steps
-	var stepsFromActivities int64
-	var caloriesOutFromActivities int64
-	for _, activity := range activities {
-		stepsFromActivities += activity.Steps
-		caloriesOutFromActivities += activity.Calories
-	}
+func caloriesOutPerStep(caloriesOut, stepsSoFar, caloriesBRM int64) float64 {
+	caloriesOutFromSteps := caloriesOut - caloriesBRM
 
-	stepsNonActivities := stepsSoFar - stepsFromActivities
-	caloriesOutNonActivities := caloriesOut - caloriesOutFromActivities
-
-	return float64(caloriesOutNonActivities / stepsNonActivities)
+	return float64(caloriesOutFromSteps) / float64(stepsSoFar)
 }
 
 func stepsLeftToGo(caloriesOutGoal, caloriesOut int64, caloriesOutPerStep float64) int64 {
