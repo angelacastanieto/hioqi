@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/angelacastanieto/hioqi/helpers"
 )
@@ -48,7 +49,7 @@ type (
 		Steps            int64   `json:"steps"`
 	}
 
-	Goals struct {
+	ActivityGoals struct {
 		ActiveMinutes int64   `json:"activeMinutes"`
 		CaloriesOut   int64   `json:"caloriesOut"`
 		Distance      float64 `json:"distance"`
@@ -57,9 +58,9 @@ type (
 	}
 
 	ActivitiesResponse struct {
-		Activities []Activity `json:"activities"`
-		Goals      Goals      `json:"goals"`
-		Summary    Summary    `json:"summary"`
+		Activities []Activity    `json:"activities"`
+		Goals      ActivityGoals `json:"goals"`
+		Summary    Summary       `json:"summary"`
 	}
 
 	User struct {
@@ -94,6 +95,30 @@ type (
 	UserResponse struct {
 		User User `json:"user"`
 	}
+
+	FoodGoals struct {
+		Calories int64 `json:"calories"`
+	}
+
+	FoodPlan struct {
+		Intensity     string `json:"intensity"`
+		EstimatedDate string `json:"estimatedDate"`
+		Personalized  bool   `json:"personalized"`
+	}
+
+	FoodGoalsResponse struct {
+		Goals    FoodGoals `json:"goals"`
+		FoodPlan FoodPlan  `json:"foodPlan"`
+	}
+
+	FoodsLogCaloriesIn struct {
+		DateTime string `json:"dateTime"`
+		Value    string `json:"value"`
+	}
+
+	CaloriesInResponse struct {
+		FoodsLogCaloriesIn []FoodsLogCaloriesIn `json:"foods-log-caloriesIn"`
+	}
 )
 
 const (
@@ -126,6 +151,25 @@ func (s *API) User(userID, token string) (UserResponse, error) {
 	return userReponse, nil
 }
 
+func (s *API) FoodGoals(token string) (FoodGoalsResponse, error) {
+	var foodGoalsResponse FoodGoalsResponse
+
+	resp, err := helpers.Get(s.Client, fmt.Sprintf("%s/user/-/foods/log/goal.json", s.URL), token)
+	if err != nil {
+		return foodGoalsResponse, err
+	}
+
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&foodGoalsResponse)
+
+	if resp.StatusCode != 200 {
+		return foodGoalsResponse, errors.New(resp.Status)
+	}
+
+	return foodGoalsResponse, nil
+}
+
 func (s *API) Activities(userID, dateString, token string) (ActivitiesResponse, error) {
 	var activitiesResponse ActivitiesResponse
 
@@ -143,4 +187,28 @@ func (s *API) Activities(userID, dateString, token string) (ActivitiesResponse, 
 	}
 
 	return activitiesResponse, nil
+}
+
+func (s *API) CaloriesIn(dateString, token string) (CaloriesInResponse, error) {
+	var caloriesInResponse CaloriesInResponse
+
+	resp, err := helpers.Get(s.Client, fmt.Sprintf("%s/user/-/foods/log/caloriesIn/date/%s/%s.json", s.URL, dateString, dateString), token)
+	if err != nil {
+		return caloriesInResponse, err
+	}
+
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&caloriesInResponse)
+
+	if resp.StatusCode != 200 {
+		return caloriesInResponse, errors.New(resp.Status)
+	}
+
+	return caloriesInResponse, nil
+}
+
+func (f *FoodsLogCaloriesIn) Calories() (int64, error) {
+	calories, err := strconv.Atoi(f.Value)
+	return int64(calories), err
 }
