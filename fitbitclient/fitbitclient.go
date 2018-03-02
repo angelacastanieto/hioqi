@@ -61,6 +61,39 @@ type (
 		Goals      Goals      `json:"goals"`
 		Summary    Summary    `json:"summary"`
 	}
+
+	User struct {
+		AboutMe                string `json:"aboutMe"`
+		Avatar150              string `json:"avatar150"`
+		Avatar640              string `json:"avatar640"`
+		City                   string `json:"city"`
+		ClockTimeDisplayFormat string `json:"clockTimeDisplayFormat"`
+		Country                string `json:"country"`
+		DateOfBirth            string `json:"dateOfBirth"`
+		DisplayName            string `json:"displayName"`
+		DistanceUnit           string `json:"distanceUnit"`
+		EncodedId              string `json:"encodedId"`
+		FoodsLocale            string `json:"foodsLocale"`
+		FullName               string `json:"fullName"`
+		Gender                 string `json:"gender"`
+		GlucoseUnitAboutMe     string `json:"glucoseUnit"`
+		Height                 string `json:"height"`
+		HeightUnit             string `json:"heightUnit"`
+		MemberSince            string `json:"memberSince"`
+		OffsetFromUTCMillis    string `json:"offsetFromUTCMillis"`
+		StartDayOfWeek         string `json:"startDayOfWeek"`
+		State                  string `json:"state"`
+		StrideLengthRunning    string `json:"strideLengthRunning"`
+		StrideLengthWalking    string `json:"strideLengthWalking"`
+		Timezone               string `json:"timezone"`
+		WaterUnit              string `json:"waterUnit"`
+		Weight                 string `json:"weight"`
+		WeightUnit             string `json:"weightUnit"`
+	}
+
+	UserResponse struct {
+		User User `json:"user"`
+	}
 )
 
 const (
@@ -72,6 +105,25 @@ func NewAPI() (*API, error) {
 		Client: &http.Client{},
 		URL:    URL,
 	}, nil
+}
+
+func (s *API) User(userID, token string) (UserResponse, error) {
+	var userReponse UserResponse
+
+	resp, err := helpers.Get(s.Client, fmt.Sprintf("%s/user/%s/profile.json", s.URL, userID), token)
+	if err != nil {
+		return userReponse, err
+	}
+
+	defer resp.Body.Close()
+
+	err = json.NewDecoder(resp.Body).Decode(&userReponse)
+
+	if resp.StatusCode != 200 {
+		return userReponse, errors.New(resp.Status)
+	}
+
+	return userReponse, nil
 }
 
 func (s *API) Activities(userID, dateString, token string) (ActivitiesResponse, error) {
