@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -10,19 +9,9 @@ import (
 	"github.com/markbates/goth/gothic"
 )
 
-const (
-	IntensityMaintenance = "MAINTENANCE"
-	IntensityEasier      = "EASIER"
-	IntensityMedium      = "MEDIUM"
-	IntensityKindaHard   = "KINDAHARD"
-	IntensityHarder      = "HARDER"
-
-	IntensityMaintenanceCalories = 0
-	IntensityEasierCalories      = 250
-	IntensityMediumCalories      = 500
-	IntensityKindaHardCalories   = 750
-	IntensityHarderCalories      = 1000
-)
+// TODO:  add caching so don't hit the Fitbit rate limit so quickly
+// TODO: figure out case where you havent taken any steps yet that day
+// TODO; what if you have reached your goal or gone over your goal for deficit?
 
 type GetUserResponse struct {
 	Avatar             string `json:"avatar"`
@@ -36,10 +25,6 @@ type GetUserResponse struct {
 	StepsGoal          int64  `json:"steps_goal"`
 	StepsSoFar         int64  `json:"steps_so_far"`
 }
-
-var (
-	ErrInvalidIntensity = errors.New("invalid intensity")
-)
 
 func GetUser(c echo.Context) error {
 	id := c.Param("id")
@@ -82,7 +67,7 @@ func GetUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
-	calorieDeficitGoal, err := calorieDeficitGoal(foodGoalsResponse.FoodPlan.Intensity)
+	calorieDeficitGoal, err := foodGoalsResponse.FoodPlan.CalorieDeficitGoal()
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
@@ -155,21 +140,4 @@ func caloriesLeftToBurn(calorieDeficitGoal, caloriesIn, caloriesOut int64) int64
 
 func stepsLeftToGo(caloriesLeftToBurn int64, caloriesOutPerStep float64) (int64, error) {
 	return int64(float64(caloriesLeftToBurn) / caloriesOutPerStep), nil
-}
-
-func calorieDeficitGoal(intensity string) (int64, error) {
-	switch intensity {
-	case IntensityMaintenance:
-		return IntensityMaintenanceCalories, nil
-	case IntensityEasier:
-		return IntensityEasierCalories, nil
-	case IntensityMedium:
-		return IntensityMediumCalories, nil
-	case IntensityKindaHard:
-		return IntensityKindaHardCalories, nil
-	case IntensityHarder:
-		return IntensityHarderCalories, nil
-	default:
-		return 0, ErrInvalidIntensity
-	}
 }

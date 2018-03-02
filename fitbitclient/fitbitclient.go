@@ -10,6 +10,22 @@ import (
 	"github.com/angelacastanieto/hioqi/helpers"
 )
 
+const (
+	URL = "https://api.fitbit.com/1"
+
+	IntensityMaintenance = "MAINTENANCE"
+	IntensityEasier      = "EASIER"
+	IntensityMedium      = "MEDIUM"
+	IntensityKindaHard   = "KINDAHARD"
+	IntensityHarder      = "HARDER"
+
+	IntensityMaintenanceCalories = 0
+	IntensityEasierCalories      = 250
+	IntensityMediumCalories      = 500
+	IntensityKindaHardCalories   = 750
+	IntensityHarderCalories      = 1000
+)
+
 type (
 	API struct {
 		Client *http.Client
@@ -121,8 +137,8 @@ type (
 	}
 )
 
-const (
-	URL = "https://api.fitbit.com/1"
+var (
+	ErrInvalidIntensity = errors.New("invalid intensity")
 )
 
 func NewAPI() (*API, error) {
@@ -211,4 +227,21 @@ func (s *API) CaloriesIn(dateString, token string) (CaloriesInResponse, error) {
 func (f *FoodsLogCaloriesIn) Calories() (int64, error) {
 	calories, err := strconv.Atoi(f.Value)
 	return int64(calories), err
+}
+
+func (f *FoodPlan) CalorieDeficitGoal() (int64, error) {
+	switch f.Intensity {
+	case IntensityMaintenance:
+		return IntensityMaintenanceCalories, nil
+	case IntensityEasier:
+		return IntensityEasierCalories, nil
+	case IntensityMedium:
+		return IntensityMediumCalories, nil
+	case IntensityKindaHard:
+		return IntensityKindaHardCalories, nil
+	case IntensityHarder:
+		return IntensityHarderCalories, nil
+	default:
+		return 0, ErrInvalidIntensity
+	}
 }
