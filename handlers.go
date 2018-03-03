@@ -134,7 +134,7 @@ func GetUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
-	err = redisClient.Set(fmt.Sprintf("%s:user_response", id), string(getUserResponseBytes[:]), time.Minute*1).Err()
+	err = redisClient.Set(fmt.Sprintf("%s:user_response", id), string(getUserResponseBytes[:]), time.Minute*5).Err()
 	if err != nil {
 		fmt.Println(err)
 	}
