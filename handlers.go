@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo"
@@ -28,11 +30,40 @@ type GetUserResponse struct {
 
 func GetUser(c echo.Context) error {
 	id := c.Param("id")
+	var resync bool
+	resyncString := c.Param("resync")
+	if resyncString != "" {
+		resync, err = strconv.ParseBool(resyncString)
+		if err != nil {
+			fmt.Println(err)
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"errors": []string{err.Error()}})
+		}
+	}
 
 	token, err := redisClient.Get(fmt.Sprintf("%s:access_token", id)).Result()
 	if err != nil {
-		fmt.Println(err)
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
+		fmt.Println("Error getting access token", err)
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{"errors": []string{err.Error()}})
+	}
+
+	if !resync {
+		userResponseCachedJSON, err := redisClient.Get(fmt.Sprintf("%s:user_response", id)).Result()
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		if userResponseCachedJSON == "" {
+			fmt.Println("nothing cached - will make new request")
+		} else {
+			var getUserResponse GetUserResponse
+			err = json.Unmarshal([]byte(userResponseCachedJSON), &getUserResponse)
+			if err != nil { // if err, log err and get new userResponse from fitbit
+				fmt.Println("Redis JSON unmarshaling error", err)
+			} else {
+				fmt.Println("returning cached data")
+				return c.JSON(http.StatusOK, getUserResponse)
+			}
+		}
 	}
 
 	timeNowString := time.Now().Format("2006-01-02")
@@ -97,6 +128,17 @@ func GetUser(c echo.Context) error {
 		CaloriesLeftToGo:   caloriesLeftToBurn,
 	}
 
+	getUserResponseBytes, err := json.Marshal(getUserResponse)
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
+	}
+
+	err = redisClient.Set(fmt.Sprintf("%s:user_response", id), string(getUserResponseBytes[:]), time.Minute*1).Err()
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	return c.JSON(http.StatusOK, getUserResponse)
 }
 
@@ -110,19 +152,19 @@ func CallbackHandler(c echo.Context) error {
 	user, err := gothic.CompleteUserAuth(c.Response(), c.Request())
 	if err != nil {
 		fmt.Println(err)
-		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000"+user.UserID)
+		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
 	}
 
 	err = redisClient.Set(fmt.Sprintf("%s:access_token", user.UserID), user.AccessToken, -time.Since(user.ExpiresAt)).Err()
 	if err != nil {
 		fmt.Println(err)
-		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000"+user.UserID)
+		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
 	}
 
 	err = redisClient.Set(fmt.Sprintf("%s:refresh_token", user.UserID), user.RefreshToken, -time.Since(user.ExpiresAt)).Err()
 	if err != nil {
 		fmt.Println(err)
-		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000"+user.UserID)
+		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
 	}
 
 	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000/users/"+user.UserID)
