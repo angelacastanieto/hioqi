@@ -11,7 +11,6 @@ import (
 	"github.com/markbates/goth/gothic"
 )
 
-// TODO:  add caching so don't hit the Fitbit rate limit so quickly
 // TODO: figure out case where you havent taken any steps yet that day
 // TODO; what if you have reached your goal or gone over your goal for deficit?
 
@@ -137,7 +136,7 @@ func GetUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
-	err = redisClient.Set(fmt.Sprintf("%s:user_response", id), string(getUserResponseBytes[:]), time.Minute*10).Err()
+	err = redisClient.Set(fmt.Sprintf("%s:user_response", id), string(getUserResponseBytes[:]), time.Minute*20).Err()
 	if err != nil {
 		fmt.Println(err)
 	}
