@@ -31,7 +31,8 @@ type GetUserResponse struct {
 func GetUser(c echo.Context) error {
 	id := c.Param("id")
 	var resync bool
-	resyncString := c.Param("resync")
+	resyncString := c.QueryParam("resync")
+
 	if resyncString != "" {
 		resync, err = strconv.ParseBool(resyncString)
 		if err != nil {
@@ -65,6 +66,8 @@ func GetUser(c echo.Context) error {
 			}
 		}
 	}
+
+	fmt.Println("getting new data")
 
 	timeNowString := time.Now().Format("2006-01-02")
 
@@ -134,7 +137,7 @@ func GetUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
-	err = redisClient.Set(fmt.Sprintf("%s:user_response", id), string(getUserResponseBytes[:]), time.Minute*5).Err()
+	err = redisClient.Set(fmt.Sprintf("%s:user_response", id), string(getUserResponseBytes[:]), time.Minute*10).Err()
 	if err != nil {
 		fmt.Println(err)
 	}
