@@ -56,7 +56,7 @@ func main() {
 
 	e := echo.New()
 	e.Use(fitbitAuth())
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
+	e.Use(session.Middleware(store))
 
 	// CORS middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

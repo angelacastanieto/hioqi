@@ -189,13 +189,6 @@ func CallbackHandler(c echo.Context) error {
 
 	sess.Save(c.Request(), c.Response())
 
-	cookie := new(http.Cookie)
-	cookie.Name = "cookie_test"
-	cookie.Value = "blah"
-	cookie.Expires = time.Now().Add(24 * time.Hour)
-	c.SetCookie(cookie)
-	// return c.JSON(http.StatusInternalServerError, map[string]interface{}{"id": user.UserID})
-
 	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000/users/"+user.UserID)
 }
 
