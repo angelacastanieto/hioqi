@@ -8,6 +8,15 @@
   version = "v3.1.0"
 
 [[projects]]
+  name = "github.com/garyburd/redigo"
+  packages = [
+    "internal",
+    "redis"
+  ]
+  revision = "a69d19351219b6dd56f274f96d85a7014a2ec34e"
+  version = "v1.6.0"
+
+[[projects]]
   name = "github.com/go-redis/redis"
   packages = [
     ".",
@@ -60,6 +69,12 @@
   ]
   revision = "b338075a0fc6e1a0683dbf03d09b4957a289e26f"
   version = "3.2.6"
+
+[[projects]]
+  name = "github.com/labstack/echo-contrib"
+  packages = ["session"]
+  revision = "7d9d9632a4aadf9b026436e43d5f96eca2d895a6"
+  version = "0.5.2"
 
 [[projects]]
   name = "github.com/labstack/gommon"
@@ -153,9 +168,15 @@
   revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
   version = "v1.0.0"
 
+[[projects]]
+  name = "gopkg.in/boj/redistore.v1"
+  packages = ["."]
+  revision = "fc113767cd6b051980f260d6dbe84b2740c46ab0"
+  version = "v1.2"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b4fe15289d6776894fd3b806624ef6c1b63e921715af6a9ea8a592182a2a646b"
+  inputs-digest = "a9c253cc8ddb38803132e310a55f98b7f3a15eb7ec368a1b4c1d14d046ddd837"
   solver-name = "gps-cdcl"
   solver-version = 1

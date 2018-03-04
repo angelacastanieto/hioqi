@@ -8,29 +8,51 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/markbates/goth/gothic"
 )
 
 // TODO: figure out case where you havent taken any steps yet that day
 // TODO; what if you have reached your goal or gone over your goal for deficit?
 
-type GetUserResponse struct {
-	Avatar             string `json:"avatar"`
-	Name               string `json:"name"`
-	StepsLeftToGo      int64  `json:"steps_left_to_go"`
-	CaloriesLeftToGo   int64  `json:"calories_left_to_go"`
-	CalorieDeficitGoal int64  `json:"calorie_deficit_goal"`
-	CaloriesGoal       int64  `json:"calories_goal"`
-	CaloriesIn         int64  `json:"calories_in"`
-	CaloriesOut        int64  `json:"calories_out"`
-	StepsGoal          int64  `json:"steps_goal"`
-	StepsSoFar         int64  `json:"steps_so_far"`
-}
+type (
+	GetUserResponse struct {
+		Avatar             string `json:"avatar"`
+		Name               string `json:"name"`
+		StepsLeftToGo      int64  `json:"steps_left_to_go"`
+		CaloriesLeftToGo   int64  `json:"calories_left_to_go"`
+		CalorieDeficitGoal int64  `json:"calorie_deficit_goal"`
+		CaloriesGoal       int64  `json:"calories_goal"`
+		CaloriesIn         int64  `json:"calories_in"`
+		CaloriesOut        int64  `json:"calories_out"`
+		StepsGoal          int64  `json:"steps_goal"`
+		StepsSoFar         int64  `json:"steps_so_far"`
+	}
+
+	Something struct {
+		UserID string `json:"user_id"`
+	}
+)
 
 func GetUser(c echo.Context) error {
 	id := c.Param("id")
 	var resync bool
 	resyncString := c.QueryParam("resync")
+	sess, err := session.Get("user_session", c)
+	if err != nil {
+		fmt.Println(err)
+		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
+	}
+
+	loggedInUser, ok := sess.Values["user_id"]
+	if !ok {
+		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
+	}
+
+	if loggedInUser != id {
+		fmt.Println(loggedInUser, "unauthorized for", id)
+		return c.NoContent(http.StatusUnauthorized)
+	}
 
 	if resyncString != "" {
 		resync, err = strconv.ParseBool(resyncString)
@@ -157,17 +179,22 @@ func CallbackHandler(c echo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
 	}
 
-	err = redisClient.Set(fmt.Sprintf("%s:access_token", user.UserID), user.AccessToken, -time.Since(user.ExpiresAt)).Err()
+	sess, err := session.Get("user_session", c)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("get session error", err)
 		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
 	}
 
-	err = redisClient.Set(fmt.Sprintf("%s:refresh_token", user.UserID), user.RefreshToken, -time.Since(user.ExpiresAt)).Err()
-	if err != nil {
-		fmt.Println(err)
-		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
-	}
+	sess.Values["user_id"] = user.UserID
+
+	sess.Save(c.Request(), c.Response())
+
+	cookie := new(http.Cookie)
+	cookie.Name = "cookie_test"
+	cookie.Value = "blah"
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	c.SetCookie(cookie)
+	// return c.JSON(http.StatusInternalServerError, map[string]interface{}{"id": user.UserID})
 
 	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000/users/"+user.UserID)
 }

@@ -5,19 +5,34 @@ import (
 
 	"github.com/angelacastanieto/hioqi/fitbitclient"
 	"github.com/go-redis/redis"
+	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/middleware"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/fitbit"
+	redistore "gopkg.in/boj/redistore.v1"
 )
 
 var (
 	err          error
 	fitbitClient *fitbitclient.API
 	redisClient  *redis.Client
+	store        *redistore.RediStore
 )
 
 func main() {
+	store, err = redistore.NewRediStore(16, "tcp", "127.0.0.1:6379", "", []byte("secret-key"))
+	if err != nil {
+		panic(err)
+	}
+
+	store.Options = &sessions.Options{
+		Path:     "/",      // to match all requests
+		MaxAge:   3600 * 1, // 1 hour
+		HttpOnly: true,
+	}
+
 	fitbitClient, err = fitbitclient.NewAPI()
 	if err != nil {
 		panic(err)
@@ -41,6 +56,8 @@ func main() {
 
 	e := echo.New()
 	e.Use(fitbitAuth())
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
+
 	// CORS middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"http://localhost:3000"},
