@@ -68,7 +68,7 @@ func main() {
 	e.GET("/auth/:provider", AuthHandler)
 	e.GET("/users/:id", GetUser)
 
-	e.Logger.Fatal(e.Start(":8000"))
+	e.Logger.Fatal(e.Start(os.Getenv("PORT")))
 }
 
 // middleware to build fitbit oauth urls
