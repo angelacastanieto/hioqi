@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/angelacastanieto/hioqi/fitbitclient"
 	"github.com/go-redis/redis"
@@ -68,7 +70,16 @@ func main() {
 	e.GET("/auth/:provider", AuthHandler)
 	e.GET("/users/:id", GetUser)
 
-	e.Logger.Fatal(e.Start(os.Getenv("PORT")))
+	for _, e := range os.Environ() {
+		pair := strings.Split(e, "=")
+		fmt.Println(pair[0])
+	}
+
+	port := "8000"
+	if os.Getenv("PORT") != "" {
+		port = os.Getenv("PORT")
+	}
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }
 
 // middleware to build fitbit oauth urls
