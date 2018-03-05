@@ -1,5 +1,5 @@
-hash: b4d8cee8d36096876dda240fb750662fb0d130b095cbad3ecb33db6a96e39b9c
-updated: 2018-03-04T21:14:09.918589456-08:00
+hash: a687c22af87eb387af50f2aabd71f1e6d93cfc0487dae72301fd7e67a3924c4a
+updated: 2018-03-04T21:28:29.869773213-08:00
 imports:
 - name: github.com/dgrijalva/jwt-go
   version: a601269ab70c205d26370c16f7c81e9017c14e04
@@ -9,7 +9,7 @@ imports:
   - internal
   - redis
 - name: github.com/go-redis/redis
-  version: d0a2b8bdf3d0104a8d766370a6af5b7697d93f25
+  version: 68362cfda1eeb3a69316e7bc00169a9a8de4823a
   subpackages:
   - internal
   - internal/consistenthash
@@ -29,13 +29,14 @@ imports:
 - name: github.com/gorilla/securecookie
   version: e59506cc896acb7f7bf732d4fdf5e25f7ccd8983
 - name: github.com/gorilla/sessions
-  version: 7087b4d669d1bc3da42fb4e2eda73ae139a24439
+  version: ca9ada44574153444b00d3fd9c8559e4cc95f896
 - name: github.com/labstack/echo
-  version: 8047be7f126b1ac75714e560995ed48544a9570a
+  version: b338075a0fc6e1a0683dbf03d09b4957a289e26f
   subpackages:
+  - echo-contrib
   - middleware
 - name: github.com/labstack/echo-contrib
-  version: 93dd5f30d5815757ef3cfd307614956c4c59d483
+  version: 7d9d9632a4aadf9b026436e43d5f96eca2d895a6
   subpackages:
   - session
 - name: github.com/labstack/gommon
@@ -46,7 +47,7 @@ imports:
   - log
   - random
 - name: github.com/markbates/goth
-  version: f3fc9dc67dce1e3461e99247d756cccf09e9835d
+  version: bc7deaf077a50416cf3a23aa5903d2a7b5a30ada
   subpackages:
   - gothic
   - providers/fitbit

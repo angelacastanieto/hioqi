@@ -1,15 +1,22 @@
 package: github.com/angelacastanieto/hioqi
 import:
 - package: github.com/go-redis/redis
+  version: ^6.9.2
 - package: github.com/gorilla/sessions
+  version: ^1.1.0
 - package: github.com/labstack/echo
+  version: ^3.2.6
   subpackages:
   - middleware
+  - echo-contrib
 - package: github.com/labstack/echo-contrib
+  version: ^0.5.2
   subpackages:
   - session
 - package: github.com/markbates/goth
+  version: ^1.45.3
   subpackages:
   - gothic
   - providers/fitbit
 - package: gopkg.in/boj/redistore.v1
+  version: ^1.2.0
