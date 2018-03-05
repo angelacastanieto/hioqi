@@ -1,6 +1,10 @@
-hash: a687c22af87eb387af50f2aabd71f1e6d93cfc0487dae72301fd7e67a3924c4a
-updated: 2018-03-04T21:28:29.869773213-08:00
+hash: 6db11168c59025d3688d8227f80bd1801d72cf0e1046266c3c0acfdb67f3d692
+updated: 2018-03-05T09:07:13.123938341-08:00
 imports:
+- name: github.com/davecgh/go-spew
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  subpackages:
+  - spew
 - name: github.com/dgrijalva/jwt-go
   version: a601269ab70c205d26370c16f7c81e9017c14e04
 - name: github.com/garyburd/redigo
@@ -55,8 +59,6 @@ imports:
   version: d228849504861217f796da67fae4f6e347643f15
 - name: github.com/mattn/go-isatty
   version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
-- name: github.com/tylerb/graceful
-  version: d37e108c89765a8e307f15b8fb2ecd10575da6bb
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
 - name: golang.org/x/crypto
