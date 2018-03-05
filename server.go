@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/angelacastanieto/hioqi/fitbitclient"
@@ -23,7 +22,7 @@ var (
 )
 
 func main() {
-	store, err = redistore.NewRediStore(16, "tcp", fmt.Sprintf("[%s]", os.Getenv("REDIS_URL")), "", []byte("secret-key"))
+	store, err = redistore.NewRediStore(16, "tcp", os.Getenv("REDIS_URL"), "", []byte("secret-key"))
 	if err != nil {
 		panic(err)
 	}
