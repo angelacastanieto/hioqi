@@ -41,12 +41,12 @@ func GetUser(c echo.Context) error {
 	sess, err := session.Get("user_session", c)
 	if err != nil {
 		fmt.Println(err)
-		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
+		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
 	}
 
 	loggedInUser, ok := sess.Values["user_id"]
 	if !ok {
-		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
+		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
 	}
 
 	if loggedInUser != id {
@@ -65,7 +65,7 @@ func GetUser(c echo.Context) error {
 	token, ok := sess.Values["access_token"]
 	if !ok {
 		fmt.Println("No access token", err)
-		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
+		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
 	}
 
 	if !resync {
@@ -176,13 +176,13 @@ func CallbackHandler(c echo.Context) error {
 	user, err := gothic.CompleteUserAuth(c.Response(), c.Request())
 	if err != nil {
 		fmt.Println(err)
-		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
+		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
 	}
 
 	sess, err := session.Get("user_session", c)
 	if err != nil {
 		fmt.Println("get session error", err)
-		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
+		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
 	}
 
 	sess.Values["user_id"] = user.UserID
@@ -191,7 +191,7 @@ func CallbackHandler(c echo.Context) error {
 
 	sess.Save(c.Request(), c.Response())
 
-	return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000/users/"+user.UserID)
+	return c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/users/%s", appConfig.HioqiWebURL, user.UserID))
 }
 
 func caloriesOutPerStep(caloriesOut, stepsSoFar, caloriesBRM int64) float64 {

@@ -25,9 +25,10 @@ var (
 )
 
 type Config struct {
-	Host     string
-	Port     string
-	RedisURL string
+	Host        string
+	Port        string
+	RedisURL    string
+	HioqiWebURL string
 }
 
 func main() {
@@ -81,7 +82,7 @@ func main() {
 
 	// CORS middleware
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{appConfig.HioqiWebURL},
 		AllowCredentials: true,
 	}))
 
@@ -108,13 +109,15 @@ func fitbitAuth() echo.MiddlewareFunc {
 func config(env string) Config {
 	var config Config
 	if env == "production" {
-		config.Host = "https://floating-depths-67623.herokuapp.com/"
+		config.Host = "https://floating-depths-67623.herokuapp.com"
 		config.Port = os.Getenv("PORT")
 		config.RedisURL = "ec2-34-239-77-182.compute-1.amazonaws.com:29889"
+		config.HioqiWebURL = "https://serene-escarpment-25648.herokuapp.com"
 	} else {
 		config.Host = "http://localhost:8000"
 		config.Port = "8000"
 		config.RedisURL = "127.0.0.1:6379"
+		config.HioqiWebURL = "http://localhost:3000"
 	}
 	return config
 }
