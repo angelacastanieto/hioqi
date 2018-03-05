@@ -25,8 +25,9 @@ var (
 )
 
 type Config struct {
-	Host string
-	Port string
+	Host     string
+	Port     string
+	RedisURL string
 }
 
 func main() {
@@ -36,7 +37,7 @@ func main() {
 
 	appConfig = config(env)
 
-	store, err = redistore.NewRediStore(16, "tcp", os.Getenv("REDIS_URL"), os.Getenv("REDIS_PASSWORD"), []byte("secret-key"))
+	store, err = redistore.NewRediStore(16, "tcp", appConfig.RedisURL, os.Getenv("REDIS_PASSWORD"), []byte("secret-key"))
 	if err != nil {
 		panic(err)
 	}
@@ -52,10 +53,15 @@ func main() {
 		panic(err)
 	}
 
-	redisClient = redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_URL"),
-		Password: os.Getenv("REDIS_PASSWORD"),
-	})
+	redisOpts := redis.Options{
+		Addr: appConfig.RedisURL,
+	}
+
+	if env != "development" {
+		redisOpts.Password = os.Getenv("REDIS_PASSWORD")
+	}
+
+	redisClient = redis.NewClient(&redisOpts)
 
 	goth.UseProviders(
 		fitbit.New(
@@ -104,9 +110,11 @@ func config(env string) Config {
 	if env == "production" {
 		config.Host = "https://floating-depths-67623.herokuapp.com/"
 		config.Port = os.Getenv("PORT")
+		config.RedisURL = "ec2-34-239-77-182.compute-1.amazonaws.com:29889"
 	} else {
 		config.Host = "http://localhost:8000"
 		config.Port = "8000"
+		config.RedisURL = "127.0.0.1:6379"
 	}
 	return config
 }

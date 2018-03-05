@@ -62,10 +62,10 @@ func GetUser(c echo.Context) error {
 		}
 	}
 
-	token, err := redisClient.Get(fmt.Sprintf("%s:access_token", id)).Result()
-	if err != nil {
-		fmt.Println("Error getting access token", err)
-		return c.JSON(http.StatusUnauthorized, map[string]interface{}{"errors": []string{err.Error()}})
+	token, ok := sess.Values["access_token"]
+	if !ok {
+		fmt.Println("No access token", err)
+		return c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
 	}
 
 	if !resync {
@@ -92,25 +92,25 @@ func GetUser(c echo.Context) error {
 
 	timeNowString := time.Now().Format("2006-01-02")
 
-	activitiesResponse, err := fitbitClient.Activities(id, timeNowString, token)
+	activitiesResponse, err := fitbitClient.Activities(id, timeNowString, token.(string))
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
-	userResponse, err := fitbitClient.User(id, token)
+	userResponse, err := fitbitClient.User(id, token.(string))
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
-	foodGoalsResponse, err := fitbitClient.FoodGoals(token)
+	foodGoalsResponse, err := fitbitClient.FoodGoals(token.(string))
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
-	caloriesInResponse, err := fitbitClient.CaloriesIn(timeNowString, token)
+	caloriesInResponse, err := fitbitClient.CaloriesIn(timeNowString, token.(string))
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
@@ -186,6 +186,8 @@ func CallbackHandler(c echo.Context) error {
 	}
 
 	sess.Values["user_id"] = user.UserID
+	sess.Values["access_token"] = user.AccessToken
+	sess.Values["refresh_token"] = user.RefreshToken
 
 	sess.Save(c.Request(), c.Response())
 
