@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/angelacastanieto/hioqi/fitbitclient"
 	"github.com/go-redis/redis"
@@ -21,9 +20,22 @@ var (
 	fitbitClient *fitbitclient.API
 	redisClient  *redis.Client
 	store        *redistore.RediStore
+	env          = "development"
+	appConfig    Config
 )
 
+type Config struct {
+	Host string
+	Port string
+}
+
 func main() {
+	if os.Getenv("ENVIRONMENT") != "" { // need to use config package
+		env = os.Getenv("ENVIRONMENT")
+	}
+
+	appConfig = config(env)
+
 	store, err = redistore.NewRediStore(16, "tcp", os.Getenv("REDIS_URL"), os.Getenv("REDIS_PASSWORD"), []byte("secret-key"))
 	if err != nil {
 		panic(err)
@@ -41,14 +53,15 @@ func main() {
 	}
 
 	redisClient = redis.NewClient(&redis.Options{
-		Addr: "127.0.0.1:6379",
+		Addr:     os.Getenv("REDIS_URL"),
+		Password: os.Getenv("REDIS_PASSWORD"),
 	})
 
 	goth.UseProviders(
 		fitbit.New(
 			os.Getenv("FITBIT_KEY"),
 			os.Getenv("FITBIT_SECRET"),
-			"http://localhost:8000/auth/fitbit/callback",
+			fmt.Sprintf("%s/auth/fitbit/callback", appConfig.Host),
 			fitbit.ScopeActivity,
 			fitbit.ScopeWeight,
 			fitbit.ScopeProfile,
@@ -70,16 +83,7 @@ func main() {
 	e.GET("/auth/:provider", AuthHandler)
 	e.GET("/users/:id", GetUser)
 
-	for _, e := range os.Environ() {
-		pair := strings.Split(e, "=")
-		fmt.Println(pair[0])
-	}
-
-	port := "8000"
-	if os.Getenv("PORT") != "" {
-		port = os.Getenv("PORT")
-	}
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", appConfig.Port)))
 }
 
 // middleware to build fitbit oauth urls
@@ -92,4 +96,17 @@ func fitbitAuth() echo.MiddlewareFunc {
 			return next(c)
 		}
 	}
+}
+
+// use for now until get config package
+func config(env string) Config {
+	var config Config
+	if env == "production" {
+		config.Host = "https://floating-depths-67623.herokuapp.com/"
+		config.Port = "8000"
+	} else {
+		config.Host = "http://localhost:8000"
+		config.Port = os.Getenv("PORT")
+	}
+	return config
 }
