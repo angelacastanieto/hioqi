@@ -1,0 +1,91 @@
+hash: b4d8cee8d36096876dda240fb750662fb0d130b095cbad3ecb33db6a96e39b9c
+updated: 2018-03-04T21:14:09.918589456-08:00
+imports:
+- name: github.com/dgrijalva/jwt-go
+  version: a601269ab70c205d26370c16f7c81e9017c14e04
+- name: github.com/garyburd/redigo
+  version: a7327d8ced8067e916e7e35490522fd0182fa839
+  subpackages:
+  - internal
+  - redis
+- name: github.com/go-redis/redis
+  version: d0a2b8bdf3d0104a8d766370a6af5b7697d93f25
+  subpackages:
+  - internal
+  - internal/consistenthash
+  - internal/hashtag
+  - internal/pool
+  - internal/proto
+  - internal/singleflight
+  - internal/util
+- name: github.com/golang/protobuf
+  version: 2bba0603135d7d7f5cb73b2125beeda19c09f4ef
+  subpackages:
+  - proto
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/mux
+  version: 07ba1fd60e210dc5cc6f86ec25dc9ecc7c95c295
+- name: github.com/gorilla/securecookie
+  version: e59506cc896acb7f7bf732d4fdf5e25f7ccd8983
+- name: github.com/gorilla/sessions
+  version: 7087b4d669d1bc3da42fb4e2eda73ae139a24439
+- name: github.com/labstack/echo
+  version: 8047be7f126b1ac75714e560995ed48544a9570a
+  subpackages:
+  - middleware
+- name: github.com/labstack/echo-contrib
+  version: 93dd5f30d5815757ef3cfd307614956c4c59d483
+  subpackages:
+  - session
+- name: github.com/labstack/gommon
+  version: c8c07aa087422c146b86d2f79556b450a8e630a1
+  subpackages:
+  - bytes
+  - color
+  - log
+  - random
+- name: github.com/markbates/goth
+  version: f3fc9dc67dce1e3461e99247d756cccf09e9835d
+  subpackages:
+  - gothic
+  - providers/fitbit
+- name: github.com/mattn/go-colorable
+  version: d228849504861217f796da67fae4f6e347643f15
+- name: github.com/mattn/go-isatty
+  version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
+- name: github.com/tylerb/graceful
+  version: d37e108c89765a8e307f15b8fb2ecd10575da6bb
+- name: github.com/valyala/fasttemplate
+  version: 3b874956e03f1636d171bda64b130f9135f42cff
+- name: golang.org/x/crypto
+  version: cb497ae8f18e3c55f81bc9f3876c8f4c3d8a2813
+  subpackages:
+  - acme
+  - acme/autocert
+- name: golang.org/x/net
+  version: 905989bd20b7c354fd28a61074eed1c8f49ebc89
+  subpackages:
+  - context
+  - context/ctxhttp
+- name: golang.org/x/oauth2
+  version: 2f32c3ac0fa4fb807a0fcefb0b6f2468a0d99bd0
+  subpackages:
+  - internal
+- name: golang.org/x/sys
+  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
+  subpackages:
+  - unix
+- name: google.golang.org/appengine
+  version: 56d253d1dd14aa01937e12c73a0971bcfd797ff2
+  subpackages:
+  - internal
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
+- name: gopkg.in/boj/redistore.v1
+  version: fc113767cd6b051980f260d6dbe84b2740c46ab0
+testImports: []
