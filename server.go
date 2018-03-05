@@ -103,10 +103,10 @@ func config(env string) Config {
 	var config Config
 	if env == "production" {
 		config.Host = "https://floating-depths-67623.herokuapp.com/"
-		config.Port = "8000"
+		config.Port = os.Getenv("PORT")
 	} else {
 		config.Host = "http://localhost:8000"
-		config.Port = os.Getenv("PORT")
+		config.Port = "8000"
 	}
 	return config
 }
