@@ -21,7 +21,6 @@ var (
 	store        *redistore.RediStore
 )
 
-//
 func main() {
 	store, err = redistore.NewRediStore(16, "tcp", os.Getenv("REDIS_URL"), os.Getenv("REDIS_PASSWORD"), []byte("secret-key"))
 	if err != nil {
