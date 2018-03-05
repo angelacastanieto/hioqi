@@ -1,1 +1,1 @@
-web: hioqi -port=$PORT
+web: hioqi -port=8000
