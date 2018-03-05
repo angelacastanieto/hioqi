@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/angelacastanieto/hioqi/fitbitclient"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
@@ -37,7 +38,7 @@ func main() {
 	}
 
 	appConfig = config(env)
-
+	spew.Dump("config is", appConfig)
 	store, err = redistore.NewRediStore(16, "tcp", appConfig.RedisURL, os.Getenv("REDIS_PASSWORD"), []byte("secret-key"))
 	if err != nil {
 		panic(err)
