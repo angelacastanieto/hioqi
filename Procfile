@@ -1,1 +1,1 @@
-web: hioqi -port=8000
+web: hioqi
