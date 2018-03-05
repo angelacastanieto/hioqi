@@ -22,7 +22,7 @@ var (
 )
 
 func main() {
-	store, err = redistore.NewRediStore(16, "tcp", "127.0.0.1:6379", "", []byte("secret-key"))
+	store, err = redistore.NewRediStore(16, "tcp", os.Getenv("REDIS_URL"), "", []byte("secret-key"))
 	if err != nil {
 		panic(err)
 	}
