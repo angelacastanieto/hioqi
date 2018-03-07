@@ -70,7 +70,7 @@ func GetUser(c echo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
 	}
 
-	if !resync {
+	if !resync { //
 		userResponseCachedJSON, err := redisClient.Get(fmt.Sprintf("%s:user_response", id)).Result()
 		if err != nil {
 			fmt.Println(err)
