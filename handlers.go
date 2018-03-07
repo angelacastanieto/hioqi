@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/markbates/goth/gothic"
@@ -29,8 +30,10 @@ type (
 		StepsSoFar         int64  `json:"steps_so_far"`
 	}
 
-	Something struct {
-		UserID string `json:"user_id"`
+	Callback struct {
+		UserID       string `json:"user_id"`
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
 	}
 )
 
@@ -62,6 +65,7 @@ func GetUser(c echo.Context) error {
 		}
 	}
 
+	spew.Dump(sess.Values)
 	token, ok := sess.Values["access_token"]
 	if !ok {
 		fmt.Println("No access token", err)
@@ -94,25 +98,26 @@ func GetUser(c echo.Context) error {
 
 	activitiesResponse, err := fitbitClient.Activities(id, timeNowString, token.(string))
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("activitiesResponse error:", err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
 	userResponse, err := fitbitClient.User(id, token.(string))
 	if err != nil {
 		fmt.Println(err)
+		fmt.Println("userResponse error:", err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
 	foodGoalsResponse, err := fitbitClient.FoodGoals(token.(string))
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("foodGoalsResponse error:", err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
 	caloriesInResponse, err := fitbitClient.CaloriesIn(timeNowString, token.(string))
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("caloriesInResponse error:", err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
@@ -173,25 +178,30 @@ func AuthHandler(c echo.Context) error {
 }
 
 func CallbackHandler(c echo.Context) error {
-	user, err := gothic.CompleteUserAuth(c.Response(), c.Request())
+	// user, err := gothic.CompleteUserAuth(c.Response(), c.Request())
+	callback := new(Callback)
+	if err = c.Bind(callback); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
+	}
+
 	if err != nil {
 		fmt.Println(err)
-		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
 	sess, err := session.Get("user_session", c)
 	if err != nil {
 		fmt.Println("get session error", err)
-		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
 	}
 
-	sess.Values["user_id"] = user.UserID
-	sess.Values["access_token"] = user.AccessToken
-	sess.Values["refresh_token"] = user.RefreshToken
+	sess.Values["user_id"] = callback.UserID
+	sess.Values["access_token"] = callback.AccessToken
+	sess.Values["refresh_token"] = callback.RefreshToken
 
 	sess.Save(c.Request(), c.Response())
 
-	return c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/users/%s", appConfig.HioqiWebURL, user.UserID))
+	return c.JSON(http.StatusOK, map[string]interface{}{"user_id": callback.UserID})
 }
 
 func caloriesOutPerStep(caloriesOut, stepsSoFar, caloriesBRM int64) float64 {

@@ -87,7 +87,7 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	e.GET("/auth/:provider/callback", CallbackHandler)
+	e.POST("/auth/:provider/callback", CallbackHandler)
 	e.GET("/auth/:provider", AuthHandler)
 	e.GET("/users/:id", GetUser)
 
