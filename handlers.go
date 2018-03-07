@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/markbates/goth/gothic"
@@ -65,7 +64,6 @@ func GetUser(c echo.Context) error {
 		}
 	}
 
-	spew.Dump(sess.Values)
 	token, ok := sess.Values["access_token"]
 	if !ok {
 		fmt.Println("No access token", err)
