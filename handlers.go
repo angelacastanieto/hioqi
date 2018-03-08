@@ -186,6 +186,7 @@ func AuthHandler(c echo.Context) error {
 
 func CallbackHandler(c echo.Context) error {
 	// user, err := gothic.CompleteUserAuth(c.Response(), c.Request())
+	fmt.Println("callback1")
 	callback := new(Callback)
 	if err = c.Bind(callback); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"errors": []string{err.Error()}})
