@@ -38,16 +38,23 @@ type (
 ) //
 
 func GetUser(c echo.Context) error {
+	spew.Dump("in get user 1")
+
 	id := c.Param("id")
+	spew.Dump("in get user 2")
+
 	var resync bool
 	resyncString := c.QueryParam("resync")
+	spew.Dump("in get user 3")
+
 	sess, err := session.Get("user_session", c)
+	spew.Dump("session values", sess.Values)
+
 	if err != nil {
 		fmt.Println(err)
 		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
 	}
 
-	spew.Dump("session values", sess.Values)
 	loggedInUser, ok := sess.Values["user_id"]
 	if !ok {
 		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
