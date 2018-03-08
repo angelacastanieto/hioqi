@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/markbates/goth/gothic"
@@ -34,7 +35,7 @@ type (
 		AccessToken  string `json:"access_token"`
 		RefreshToken string `json:"refresh_token"`
 	}
-)
+) //
 
 func GetUser(c echo.Context) error {
 	id := c.Param("id")
@@ -46,6 +47,7 @@ func GetUser(c echo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
 	}
 
+	spew.Dump("session values", sess.Values)
 	loggedInUser, ok := sess.Values["user_id"]
 	if !ok {
 		return c.Redirect(http.StatusTemporaryRedirect, appConfig.HioqiWebURL)
