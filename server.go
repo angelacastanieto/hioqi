@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/angelacastanieto/hioqi/fitbitclient"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
@@ -38,7 +37,6 @@ func main() {
 	}
 
 	appConfig = config(env)
-	spew.Dump("config is", appConfig)
 	store, err = redistore.NewRediStore(16, "tcp", appConfig.RedisURL, os.Getenv("REDIS_PASSWORD"), []byte("secret-key"))
 	if err != nil {
 		panic(err)
@@ -113,7 +111,7 @@ func config(env string) Config {
 		config.Host = "https://floating-depths-67623.herokuapp.com"
 		config.Port = os.Getenv("PORT")
 		config.RedisURL = "ec2-34-239-77-182.compute-1.amazonaws.com:29889"
-		config.HioqiWebURL = "https://serene-escarpment-25648.herokuapp.com"
+		config.HioqiWebURL = "https://hioqi.herokuapp.com"
 	} else {
 		config.Host = "http://localhost:8000"
 		config.Port = "8000"
